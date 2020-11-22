@@ -2,6 +2,13 @@
 #define DATE_H_
 
 #include <stdbool.h>
+#include <stdio.h>
+
+#define MAX_DAY 30
+#define MIN_DAY 1
+#define MAX_MONTH 12
+#define MIN_MONTH 1
+
 
 /** Type for defining the date */
 typedef struct Date_t *Date;
@@ -66,5 +73,17 @@ int dateCompare(Date date1, Date date2);
 *
 */
 void dateTick(Date date);
+
+
+/**
+* isValidDate: Checks if date is valid.
+* 
+* @param date - Target Date
+* 
+* @return 
+* 		False if date is not valid.
+*		Otherwise true.
+*/
+static bool isValidDate(Date date);
 
 #endif //DATE_H_
