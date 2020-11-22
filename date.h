@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_DAY 30
 #define MIN_DAY 1
@@ -67,7 +68,7 @@ bool dateGet(Date date, int* day, int* month, int* year);
 int dateCompare(Date date1, Date date2);
 
 /**
-* dateTick: increases the date by one day, if date is NULL should do nothing.
+* dateTick:  increases the date by one day, if date is NULL should do nothing.
 *
 * @param date - Target Date
 *
@@ -85,5 +86,8 @@ void dateTick(Date date);
 *		Otherwise true.
 */
 static bool isValidDate(Date date);
+
+//DELETE ME!!!!!
+void printDate(Date date);
 
 #endif //DATE_H_
