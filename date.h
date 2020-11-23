@@ -85,7 +85,7 @@ void dateTick(Date date);
 * 		False if date is not valid.
 *		Otherwise true.
 */
-static bool isValidDate(Date date);
+bool isValidDate(Date date);
 
 //DELETE ME!!!!!
 void printDate(Date date);

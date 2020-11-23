@@ -17,7 +17,7 @@ Member memberCreate(char* name, int id)
     {
         return NULL;
     }
-    char* new_name = malloc(sizeof(strlen(name)+1));
+    char* new_name = malloc((int)strlen(name)+1);
     if(!new_name)
     {
         free(member);
@@ -26,6 +26,8 @@ Member memberCreate(char* name, int id)
     strcpy(new_name, name);
     member->name = new_name;
     member->id = id;
+
+    return member;
 }
 
 void memberDestroy(Member member)
@@ -76,5 +78,5 @@ bool memberIdCompare(Member member1, Member member2)
 
 void printMember(Member member)
 {
-    printf("name: %s, id: %d\n");
+    printf("name: %s, id: %d\n", member->name, member->id);
 }

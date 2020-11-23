@@ -35,7 +35,7 @@ int main(void)
     int x,y,z;
     int *px = &x,*py = &y,*pz = &z;
     dateGet(date2,px,py,pz);
-    printf("%d%d%d\n",x,y,x);
+    printf("%d%d%d\n",x,y,z);
 
     //isValidDate TEST
     Date date3 = dateCreate(0,2,2);

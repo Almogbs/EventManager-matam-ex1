@@ -109,7 +109,7 @@ void dateTick(Date date)
 }
 
 
-static bool isValidDate(Date date)
+bool isValidDate(Date date)
 {
     if(date->day < MIN_DAY || date->day > MAX_DAY || date->month < MIN_MONTH || date->month > MAX_MONTH)
     {

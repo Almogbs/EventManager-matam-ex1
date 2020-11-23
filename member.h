@@ -44,7 +44,7 @@ void memberDestroy(Member member);
 Member memberCopy(Member member);
 
 /**
-* memberGet: Returns the name and id of a member
+* memberIdGet: Returns the name and id of a member
 *
 * @param member - Target member
 * @param id - the pointer to assign to id of the member into.
@@ -53,7 +53,7 @@ Member memberCopy(Member member);
 * 	false if one of pointers is NULL.
 * 	Otherwise true and the member is assigned to the pointers.
 */
-bool memberGet(Member member, int* id);
+bool memberIdGet(Member member, int* id);
 
 /**
 * memberIdCompare: compare the member's id
