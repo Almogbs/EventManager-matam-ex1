@@ -118,6 +118,15 @@ bool isValidDate(Date date)
     return true;
 }
 
+bool dateEqual(Date date1, Date date2)
+{
+    if(dateCompare(date1, date2) != 0)
+    {
+        return false;
+    }
+    return true;
+}
+
 //DELETE ME!!!!!
 void printDate(Date date)
 {

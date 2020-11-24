@@ -2,6 +2,10 @@
 #define PRIORITY_QUEUE_H
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+
 
 /**
 * Generic Priority Queue Container
@@ -33,6 +37,9 @@
 
 /** Type for defining the priority queue */
 typedef struct PriorityQueue_t *PriorityQueue;
+
+/** Type for defining Node to the priority queue */
+typedef struct Node_t *Node;
 
 /** Type used for returning error codes from priority queue functions */
 typedef enum PriorityQueueResult_t {

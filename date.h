@@ -87,6 +87,8 @@ void dateTick(Date date);
 */
 bool isValidDate(Date date);
 
+bool dateEqual(Date date1, Date date2);
+
 //DELETE ME!!!!!
 void printDate(Date date);
 
