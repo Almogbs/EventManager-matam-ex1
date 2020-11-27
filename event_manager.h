@@ -3,6 +3,7 @@
 
 #include "date.h"
 
+
 typedef struct EventManager_t* EventManager;
 
 typedef enum EventManagerResult_t {

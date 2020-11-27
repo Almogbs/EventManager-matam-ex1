@@ -4,6 +4,7 @@
 struct Member_t {
     char* name;
     int id;
+    struct Member_t* next;
 };
 
 Member memberCreate(char* name, int id)
@@ -26,7 +27,7 @@ Member memberCreate(char* name, int id)
     strcpy(new_name, name);
     member->name = new_name;
     member->id = id;
-
+    member->next = NULL;
     return member;
 }
 
@@ -36,9 +37,35 @@ void memberDestroy(Member member)
     {
         return;
     }
-    free(member->name);
-    free(member);
+    while(member)
+    {
+        Member to_delete = member;
+        member = member->next;
+        free(to_delete->name);
+        free(to_delete);
+    }
 }
+
+
+bool memberInsert(Member member, Member to_add)
+{
+    if(!member || !to_add)
+    {
+        return false;
+    }
+    Member new_member = memberCopy(to_add);
+    if(!new_member)
+    {
+        return false;
+    }
+    new_member->next = member;
+    member = new_member;
+    return true;
+}
+
+
+
+
 Member memberCopy(Member member)
 {
     if(!member)
@@ -53,28 +80,54 @@ Member memberCopy(Member member)
     return new_member;
 }
 
-bool memberIdGet(Member member, int* id)
+bool memberContain(Member member, int id)
 {
-    if(!member || !id)
+    if(!member)
     {
         return false;
     }
-    *id = member->id;
-    return true;
-}
-
-bool memberIdCompare(Member member1, Member member2)
-{
-    if(!member1 || !member2)
+    Member temp_member = member;
+    while(temp_member)
     {
-        return false;
-    }
-    if(member1->id == member2->id)
-    {
-        return true;
+        if(temp_member->id == id)
+        {
+            return true;
+        }
+        temp_member = temp_member->next;
     }
     return false;
 }
+
+void memberRemove(Member member, int id)
+{
+    if(!member)
+    {
+        return;
+    }
+    if(member->id == id)
+    {
+        Member to_remove = member;
+        member = member->next;
+        free(to_remove->name);
+        free(to_remove);
+        return;
+    }
+    Member temp_member = member;
+    while(temp_member->next)
+    {
+        if(temp_member->next->id == id)
+        {
+            Member to_delete = temp_member->next;
+            temp_member->next = to_delete->next;
+            free(to_delete->name);
+            free(to_delete);
+            return;
+        }
+        temp_member = temp_member->next;
+    }
+    return;
+}
+
 
 void printMember(Member member)
 {

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #define MAX_DAY 30
 #define MIN_DAY 1
 #define MAX_MONTH 12

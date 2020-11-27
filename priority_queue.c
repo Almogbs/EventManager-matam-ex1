@@ -1,4 +1,13 @@
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 #include "priority_queue.h"
+
+/** Type for defining Node to the priority queue */
+typedef struct Node_t *Node;
+
 
 struct Node_t {
     PQElement element;
@@ -17,7 +26,7 @@ struct PriorityQueue_t {
     Node iterator;
 };
 
-Node nodeCreate(PQElement element, PQElementPriority priority)
+static Node nodeCreate(PQElement element, PQElementPriority priority)
 {
     if(!element || !priority)
     {
@@ -150,7 +159,7 @@ bool pqContains(PriorityQueue queue, PQElement element)
     Node head_ptr = queue->head;
     while(head_ptr)
     {
-        if(queue->equal_elements(head_ptr, element))
+        if(queue->equal_elements(head_ptr->element, element))
         {
             return true;
         }
@@ -212,9 +221,9 @@ PriorityQueueResult pqChangePriority(PriorityQueue queue, PQElement element,
     {
         return PQ_NULL_ARGUMENT;
     }
-    Node head_ptr = queue->head;;
     if(queue->compare_priorities(old_priority, queue->head->priority) == 0)
     {
+        Node head_ptr = queue->head->next;
         queue->free_element(queue->head->element);
         queue->free_priority(queue->head->priority);
         free(queue->head);
@@ -222,6 +231,7 @@ PriorityQueueResult pqChangePriority(PriorityQueue queue, PQElement element,
     }
     else
     {
+        Node head_ptr = queue->head;
         assert(queue->compare_priorities(queue->head->priority, old_priority));
         while(head_ptr->next && queue->compare_priorities(old_priority, head_ptr->next->priority) != 0)
         {
@@ -262,11 +272,11 @@ PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
     }
     Node temp_head = queue->head;
 
-    if(queue->equal_elements(queue->head, element))
+    if(queue->equal_elements(queue->head->element, element))
     {
         return pqRemove(queue);
     }
-    while(temp_head->next && queue->equal_elements(element, temp_head->next) != 0)
+    while(temp_head->next && queue->equal_elements(element, temp_head->next->element) != 0)
     {
         temp_head = temp_head->next;
     }

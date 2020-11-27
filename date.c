@@ -1,5 +1,9 @@
-#include "date.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
+#include "date.h"
+
 
 struct Date_t {
     int day;
