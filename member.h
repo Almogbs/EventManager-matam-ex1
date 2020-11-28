@@ -71,7 +71,6 @@ bool memberInsert(Member member, Member to_add);
 *
 * @param member - Target member list
 * @param id - the id of the member.
-*
 * @return
 * 	false if one of pointers is NULL or if there is no member in the list with the id.
 * 	Otherwise true.

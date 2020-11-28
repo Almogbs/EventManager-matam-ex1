@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "date.h"
 
 #define MIN_EVENT_ID 0
 
@@ -18,11 +18,12 @@ typedef struct Event_t *Event;
 *
 * @param name - the name of the event.
 * @param event_id - the id of the event.
+* @param date - the date if the event.
 * @return
 * 	NULL - if allocation failed or event is illegal.
 * 	A new Event in case of success.
 */
-Event eventCreate(char* name, int event_id);
+Event eventCreate(char* name, int event_id, Date date);
 
 /**
 * eventDestroy: Deallocates an existing event.
@@ -42,16 +43,25 @@ void eventDestroy(Event event);
 Event eventCopy(Event event);
 
 /**
-* eventGet: Returns the name and the id of the event.
+* eventGet: Returns the name, the id and the date of the event.
 *
 * @param event - Target event
 * @param name - the pointer to assign to name of the event into.
-* @param event_id - the pointer to assign to id of the event into.*
+* @param event_id - the pointer to assign to id of the event into.
+* @param date - the pointer to assign to date of the event into.
 * @return
 * 	false if one of pointers is NULL.
 * 	Otherwise true and the event is assigned to the pointers.
 */
-bool eventGet(Event event, char* name, int* event_id);
+bool eventGet(Event event, char* name, int* event_id, Date date);
+
+
+const char* eventGetName(Event event);
+
+const Date eventGetDate(Event event);
+
+const int eventGetId(Event event);
+
 
 /**
 * eventEqual: Checks if the events have same id.
@@ -62,6 +72,7 @@ bool eventGet(Event event, char* name, int* event_id);
 */
 bool eventEqual(Event event1, Event event2);
 
+bool eventCompare(Event event1, Event event2);
 
 
 

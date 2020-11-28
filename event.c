@@ -4,10 +4,11 @@
 struct Event_t{
     char* name;
     int event_id;
+    Date date;
 };
 
 
-Event eventCreate(char* name, int event_id)
+Event eventCreate(char* name, int event_id, Date date)
 {
     if(!name || event_id < 0)
     {
@@ -24,9 +25,18 @@ Event eventCreate(char* name, int event_id)
         free(event);
         return NULL;
     }
+    Date event_date = dateCopy(date);
+    if(!event_date)
+    {
+        free(event);
+        free(event_name);
+        return NULL;
+    }
+    
     strcpy(event_name, name);
     event->name = event_name;
     event->event_id = event_id;
+    event->date = event_date;
     return event;
 }
 
@@ -38,6 +48,7 @@ void eventDestroy(Event event)
         return;
     }
     free(event->name);
+    dateDestroy(event->date);
     free(event);
 }
 
@@ -49,23 +60,49 @@ Event eventCopy(Event event)
     {
         return NULL;
     }
-    return eventCreate(event->name, event->event_id);
+    return eventCreate(event->name, event->event_id, event->date);
 }
 
 
 
-bool eventGet(Event event, char* name, int* event_id)
+bool eventGet(Event event, char* name, int* event_id, Date date)
 {
-    if(!event || !name || !event_id)
+    if(!event || !name || !event_id || !date)
     {
         return false;
     }
     strcpy(name, event->name);
     *event_id = event->event_id;
+    date = event->date;
     return true;
 }
 
+const char* eventGetName(Event event)
+{
+    if(!event)
+    {
+        return NULL;
+    }
+    return event->name;
+}
 
+const int eventGetId(Event event)
+{
+    if(!event)
+    {
+        return -1;
+    }
+    return event->event_id;
+}
+
+const Date eventGetDate(Event event)
+{
+    if(!event)
+    {
+        return NULL;
+    }
+    return event->date;
+}
 
 bool eventEqual(Event event1, Event event2)
 {
@@ -79,3 +116,17 @@ bool eventEqual(Event event1, Event event2)
     }
     return false;
 }
+
+bool eventCompare(Event event1, Event event2)
+{
+    if(!event1 || !event2)
+    {
+        return false;
+    }
+    if(strcmp(eventGetName(event1), eventGetName(event2)) == 0 && dateEqual(event1->date, event2->date))
+    {
+        return true;
+    }
+    return false;
+}
+

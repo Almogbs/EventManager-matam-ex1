@@ -49,7 +49,7 @@ void memberDestroy(Member member)
 
 bool memberInsert(Member member, Member to_add)
 {
-    if(!member || !to_add)
+    if(!to_add)
     {
         return false;
     }
@@ -57,6 +57,11 @@ bool memberInsert(Member member, Member to_add)
     if(!new_member)
     {
         return false;
+    }
+    if(!member)
+    {
+        member = new_member;
+        return true;
     }
     new_member->next = member;
     member = new_member;

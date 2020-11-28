@@ -44,6 +44,11 @@ static int compareDate(PQElementPriority date1, PQElementPriority date2)
     return dateCompare((Date*)date1, (Date*)date2);
 }
 
+/**
+ * 
+ */
+
+
 // Struct for Event Manager
 struct EventManager_t{
     Date init_date;
@@ -77,6 +82,7 @@ EventManager createEventManager(Date date)
     }
     em->event_list = pq;
     em->init_date = init_date;
+    em->member_list = NULL;
     return em;
 }
 
@@ -107,11 +113,192 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
     {
         return EM_INVALID_EVENT_ID;
     }
-    Event new_event = eventCreate(event_name, event_id);
+    Event new_event = eventCreate(event_name, event_id, date);
     if(!new_event)
     {
         return EM_OUT_OF_MEMORY;
     }
+    Date new_date = dateCopy(date);
+    {
+        if(!date)
+        {
+            eventDestroy(new_event);
+            return EM_OUT_OF_MEMORY;
+        }
+    }
+
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        if(eventCompare(iter, new_event))
+        {
+            eventDestroy(new_event);
+            dateDestroy(new_date);
+            return EM_EVENT_ALREADY_EXISTS;
+        }
+        else if(eventEqual(iter, new_event))
+        {
+            eventDestroy(new_event);
+            dateDestroy(new_date);
+            return EM_EVENT_ID_ALREADY_EXISTS;
+        }
+    }
+    PriorityQueueResult result = pqInsert(em->event_list, (PQElement)new_event, (PQElementPriority)new_date);
+    switch (result)
+    {
+    case PQ_NULL_ARGUMENT:
+            eventDestroy(new_event);
+            dateDestroy(new_date);
+            return EM_NULL_ARGUMENT;
+    case PQ_OUT_OF_MEMORY:
+            eventDestroy(new_event);
+            dateDestroy(new_date);
+            return EM_OUT_OF_MEMORY;
+    case PQ_SUCCESS:
+            return EM_SUCCESS;
+    default:
+        return EM_ERROR;
+    }
+    return EM_ERROR;
+}
+
+EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days, int event_id)
+{
+    if(!em || !event_name)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    Date new_date = dateCopy(em->init_date);
+    if(!new_date)
+    {
+        return EM_OUT_OF_MEMORY;
+    }
+    for(int i=0; i<days; i++)
+    {
+        dateTick(new_date);
+    }
+    dateDestroy(new_date);
+    return emAddEventByDate(em, event_name, new_date, event_id);
+}
+
+EventManagerResult emRemoveEvent(EventManager em, int event_id)
+{
+    if(!em)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    if(event_id < MIN_EVENT_ID)
+    {
+        return EM_INVALID_EVENT_ID;
+    }
+    Event temp_event = NULL;
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        if(eventGetId(iter) == event_id)
+        {
+            temp_event = iter;
+            break;
+        }
+    }
+    PriorityQueueResult result = pqRemoveElement(em->event_list, (PQElement)temp_event);
+    switch(result)
+    {
+    case PQ_NULL_ARGUMENT:
+        return EM_EVENT_NOT_EXISTS;
+    case PQ_ELEMENT_DOES_NOT_EXISTS:
+        return EM_EVENT_NOT_EXISTS;
+    case PQ_SUCCESS:
+        return EM_SUCCESS;
+    default:
+        return EM_ERROR;
+    }
+    return EM_ERROR;
+}
+
+EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_date)
+{
+    if(!em || !new_date)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    if(event_id < MIN_EVENT_ID)
+    {
+        return EM_INVALID_EVENT_ID;
+    }
+    Event temp_event = NULL;
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        if(eventGetId(iter) == event_id)
+        {
+            temp_event = iter;
+            break;
+        }
+    }
+    if(!temp_event)
+    {
+        return EM_EVENT_ID_NOT_EXISTS;
+    }
+    if(dateCompare(new_date, em->init_date) > 0)
+    {
+        return EM_INVALID_DATE;
+    }
+    
+    Event iterate_event = eventCreate(eventGetName(temp_event), eventGetId(temp_event), eventGetDate(temp_event));
+    if(!iterate_event)
+    {
+        return EM_OUT_OF_MEMORY;
+    }
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        if(eventCompare(iter, iterate_event))
+        {
+            eventDestroy(iterate_event);
+            return EM_EVENT_ALREADY_EXISTS;
+        }
+    }
+    eventDestroy(iterate_event);
+    PriorityQueueResult result = pqChangePriority(  em->event_list, 
+                                                    (PQElement)temp_event, 
+                                                    (PQElementPriority)eventGetDate(temp_event), 
+                                                    (PQElementPriority)new_date);
+    switch(result)
+    {
+    case PQ_NULL_ARGUMENT:
+        return EM_NULL_ARGUMENT;
+    case PQ_OUT_OF_MEMORY:
+        return EM_OUT_OF_MEMORY;
+    case PQ_SUCCESS:
+        return EM_SUCCESS;
+    default:
+        return EM_ERROR;
+    }
+    return EM_ERROR;
+}
 
 
+EventManagerResult emAddMember(EventManager em, char* member_name, int member_id)
+{
+    if(!em || !member_name)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    if(member_id < MIN_ID)
+    {
+        return EM_INVALID_MEMBER_ID;
+    }
+    if(memberContain(em->member_list, member_id))
+    {
+        return EM_MEMBER_ID_ALREADY_EXISTS;
+    }
+    Member to_add = memberCreate(member_name, member_id);
+    if(!to_add)
+    {
+        return EM_OUT_OF_MEMORY;
+    }
+    if(!memberInsert(em->member_list, to_add))
+    {
+        memberDestroy(to_add);
+        return EM_OUT_OF_MEMORY;
+    }
+    memberDestroy(to_add);
+    return EM_SUCCESS;
 }
