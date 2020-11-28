@@ -68,6 +68,7 @@ bool dateGet(Date date, int* day, int* month, int* year);
 */
 int dateCompare(Date date1, Date date2);
 
+
 /**
 * dateTick:  increases the date by one day, if date is NULL should do nothing.
 *
