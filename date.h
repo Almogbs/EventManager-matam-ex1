@@ -77,18 +77,6 @@ int dateCompare(Date date1, Date date2);
 */
 void dateTick(Date date);
 
-
-/**
-* isValidDate: Checks if date is valid.
-* 
-* @param date - Target Date
-* 
-* @return 
-* 		False if date is not valid.
-*		Otherwise true.
-*/
-bool isValidDate(Date date);
-
 bool dateEqual(Date date1, Date date2);
 
 #endif //DATE_H_

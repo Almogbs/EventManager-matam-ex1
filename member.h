@@ -88,9 +88,12 @@ bool memberContain(Member member, int id);
 */
 void memberRemove(Member member, int id);
 
+const Member getMember(Member member, int member_id);
+
+
 
 //DELETE ME!!!!!
-void printMember(Member member);
+void printMembers(Member member, FILE* fd);
 
 #endif /**  MEMBER_H_  */
 

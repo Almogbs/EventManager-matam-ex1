@@ -16,32 +16,32 @@
 
 static PQElement copyEvent(PQElement event)
 {
-    return eventCopy((Event*)event);
+    return (PQElement)eventCopy((Event)event);
 }
 
 static void freeEvent(PQElement event)
 {
-    eventDestroy((Event*)event);
+    eventDestroy((Event)event);
 }
 
 static bool equalEvent(PQElement event1, PQElement event2)
 {
-    return eventEqual((Event*)event1, (Event*)event2);
+    return eventEqual((Event)event1, (Event)event2);
 }
 
 static PQElementPriority copyDate(PQElementPriority date)
 {
-    return dateCopy((Date*)date);
+    return (PQElementPriority)dateCopy((Date)date);
 }
 
 static void freeDate(PQElementPriority date)
 {
-    dateDestroy((Date*)date);
+    dateDestroy((Date)date);
 }
 
 static int compareDate(PQElementPriority date1, PQElementPriority date2)
 {
-    return dateCompare((Date*)date1, (Date*)date2);
+    return dateCompare((Date)date1, (Date)date2);
 }
 
 /**
@@ -58,7 +58,7 @@ struct EventManager_t{
 
 EventManager createEventManager(Date date)
 {
-    if(!date || isValidDate(date) == false)
+    if(!date)
     {
         return NULL;
     }
@@ -154,9 +154,13 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
             dateDestroy(new_date);
             return EM_OUT_OF_MEMORY;
     case PQ_SUCCESS:
+            eventDestroy(new_event);
+            dateDestroy(new_date);
             return EM_SUCCESS;
     default:
-        return EM_ERROR;
+            eventDestroy(new_event);
+            dateDestroy(new_date);
+            return EM_ERROR;
     }
     return EM_ERROR;
 }
@@ -176,8 +180,9 @@ EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days,
     {
         dateTick(new_date);
     }
+    EventManagerResult result = emAddEventByDate(em, event_name, new_date, event_id);
     dateDestroy(new_date);
-    return emAddEventByDate(em, event_name, new_date, event_id);
+    return result;
 }
 
 EventManagerResult emRemoveEvent(EventManager em, int event_id)
@@ -255,11 +260,11 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
             return EM_EVENT_ALREADY_EXISTS;
         }
     }
-    eventDestroy(iterate_event);
     PriorityQueueResult result = pqChangePriority(  em->event_list, 
                                                     (PQElement)temp_event, 
                                                     (PQElementPriority)eventGetDate(temp_event), 
                                                     (PQElementPriority)new_date);
+    eventDestroy(iterate_event);                                                
     switch(result)
     {
     case PQ_NULL_ARGUMENT:
@@ -302,3 +307,157 @@ EventManagerResult emAddMember(EventManager em, char* member_name, int member_id
     memberDestroy(to_add);
     return EM_SUCCESS;
 }
+
+
+EventManagerResult emAddMemberToEvent(EventManager em, int member_id, int event_id)
+{
+    if(!em)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    if(member_id < MIN_ID)
+    {
+        return EM_INVALID_MEMBER_ID;
+    }
+    if(event_id < MIN_EVENT_ID)
+    {
+        return EM_INVALID_EVENT_ID;
+    }
+    Event event_ptr = NULL;
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        if(eventGetId(iter) == event_id)
+        {
+            event_ptr = iter;
+            break;
+        }
+    }
+    if(!event_ptr)
+    {
+        return EM_EVENT_ID_NOT_EXISTS;
+    }
+    if(memberContain(em->member_list, member_id))
+    {
+        return EM_MEMBER_ID_NOT_EXISTS;
+    }
+    if(memberContain(eventGetMember(event_ptr), member_id))
+    {
+        return EM_EVENT_AND_MEMBER_ALREADY_LINKED;
+    }
+    if(memberInsert(eventGetMember(event_ptr), getMember(em->member_list, member_id)))
+    {
+        return EM_SUCCESS;
+    }
+    return EM_OUT_OF_MEMORY;
+}
+
+
+EventManagerResult emRemoveMemberFromEvent (EventManager em, int member_id, int event_id)
+{
+    if(!em)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    if(member_id < MIN_ID)
+    {
+        return EM_INVALID_MEMBER_ID;
+    }
+    if(event_id < MIN_EVENT_ID)
+    {
+        return EM_INVALID_EVENT_ID;
+    }
+    Event event_ptr = NULL;
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        if(eventGetId(iter) == event_id)
+        {
+            event_ptr = iter;
+            break;
+        }
+    }
+    if(!event_ptr)
+    {
+        return EM_EVENT_ID_NOT_EXISTS;
+    }
+    if(memberContain(em->member_list, member_id))
+    {
+        return EM_MEMBER_ID_NOT_EXISTS;
+    }
+    
+    if(!memberContain(eventGetMember(event_ptr), member_id))
+    {
+        return EM_EVENT_AND_MEMBER_NOT_LINKED;
+    }
+    memberRemove(eventGetMember(event_ptr), member_id);
+    return EM_SUCCESS;
+}
+
+
+EventManagerResult emTick(EventManager em, int days)
+{
+    if(!em)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    if(days <= 0)
+    {
+        return EM_INVALID_DATE;
+    }
+    for(int i=0; i<days; i++)
+    {
+        dateTick(em->init_date);
+    }
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        if(dateCompare(em->init_date, eventGetDate(iter)) > 0)
+        {
+            pqRemoveElement(em->event_list, (PQElement)iter);
+        }
+    }
+    return EM_SUCCESS;
+}
+
+
+int emGetEventsAmount(EventManager em)
+{
+    return pqGetSize(em->event_list);
+}
+
+
+char* emGetNextEvent(EventManager em)
+{
+    if(!em)
+    {
+        return NULL;
+    }
+    Event event_ptr = (Event)pqGetFirst(em->event_list);
+    return eventGetName(event_ptr);
+}
+
+void emPrintAllEvents(EventManager em, const char* file_name)
+{
+    FILE* fd = fopen(file_name, "w");
+    if(!fd)
+    {
+        return;
+    }
+    PQ_FOREACH(Event, iter, em->event_list)
+    {
+        int *day = NULL, *month = NULL, *year = NULL;
+        Date date = eventGetDate(iter);
+        if(!date)
+        {
+            return;
+        }
+        if(!dateGet(date, day, month, year))
+        {
+            return;
+        }
+        fprintf(fd, "%s,%d.%d.%d", eventGetName(iter), *day, *month, *year);
+        printMembers(eventGetMember(iter), fd);
+    }
+    fclose(fd);
+}
+
+
+void emPrintAllResponsibleMembers(EventManager em, const char* file_name);

@@ -5,6 +5,7 @@ struct Event_t{
     char* name;
     int event_id;
     Date date;
+    Member members;
 };
 
 
@@ -37,6 +38,7 @@ Event eventCreate(char* name, int event_id, Date date)
     event->name = event_name;
     event->event_id = event_id;
     event->date = event_date;
+    event->members = NULL;
     return event;
 }
 
@@ -49,6 +51,7 @@ void eventDestroy(Event event)
     }
     free(event->name);
     dateDestroy(event->date);
+    memberDestroy(event->members);
     free(event);
 }
 
@@ -77,7 +80,7 @@ bool eventGet(Event event, char* name, int* event_id, Date date)
     return true;
 }
 
-const char* eventGetName(Event event)
+char* eventGetName(Event event)
 {
     if(!event)
     {
@@ -102,6 +105,15 @@ const Date eventGetDate(Event event)
         return NULL;
     }
     return event->date;
+}
+
+const Member eventGetMember(Event event)
+{
+    if(!event)
+    {
+        return NULL;
+    }
+    return event->members;
 }
 
 bool eventEqual(Event event1, Event event2)

@@ -83,7 +83,6 @@ void pqDestroy(PriorityQueue queue)
     {
         return;
     }
-    assert(queue!=NULL);
     while(queue->head)
     {
         Node to_delete = queue->head;
@@ -205,7 +204,7 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
     }
     Node temp_head = (queue->head);
     assert(queue->compare_priorities(queue->head->priority, to_add->priority) >= 0);
-    while(!(temp_head->next) && queue->compare_priorities(temp_head->next->priority, to_add->priority) > 0)
+    while((temp_head->next) && queue->compare_priorities(temp_head->next->priority, to_add->priority) > 0)
     {
         temp_head = temp_head->next;
     }
@@ -257,6 +256,10 @@ PriorityQueueResult pqRemove(PriorityQueue queue)
         return PQ_NULL_ARGUMENT;
     }
     Node to_remove = queue->head;
+    if(!queue->head)
+    {
+        return PQ_ERROR;
+    }
     queue->head = to_remove->next;
     queue->free_element(to_remove->element);
     queue->free_priority(to_remove->priority);

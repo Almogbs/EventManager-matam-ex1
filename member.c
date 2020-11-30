@@ -69,7 +69,23 @@ bool memberInsert(Member member, Member to_add)
 }
 
 
-
+const Member getMember(Member member, int member_id)
+{
+    if(!member)
+    {
+        return NULL;
+    }
+    Member temp_member = member;
+    while(temp_member)
+    {
+        if(temp_member->id == member_id)
+        {
+            return temp_member;
+        }
+        temp_member = temp_member->next;
+    }
+    return NULL;
+}
 
 Member memberCopy(Member member)
 {
@@ -134,7 +150,17 @@ void memberRemove(Member member, int id)
 }
 
 
-void printMember(Member member)
+
+void printMembers(Member member, FILE* fd)
 {
-    printf("name: %s, id: %d\n", member->name, member->id);
+    if(!member || !fd)
+    {
+        return;
+    }
+    Member temp_member = member;
+    while(temp_member)
+    {
+        fprintf(fd, ",%s", temp_member->name);
+        temp_member = temp_member->next;    
+    }
 }

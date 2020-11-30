@@ -11,6 +11,16 @@ struct Date_t {
     int year;
 };
 
+static bool isValidDate(Date date)
+{
+    if(date->day < MIN_DAY || date->day > MAX_DAY || date->month < MIN_MONTH || date->month > MAX_MONTH)
+    {
+        return false;
+    }
+    return true;
+}
+
+
 
 Date dateCreate(int day, int month, int year)
 {
@@ -113,14 +123,6 @@ void dateTick(Date date)
 }
 
 
-bool isValidDate(Date date)
-{
-    if(date->day < MIN_DAY || date->day > MAX_DAY || date->month < MIN_MONTH || date->month > MAX_MONTH)
-    {
-        return false;
-    }
-    return true;
-}
 
 bool dateEqual(Date date1, Date date2)
 {

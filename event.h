@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "date.h"
+#include "member.h"
+
 
 #define MIN_EVENT_ID 0
 
@@ -56,11 +58,13 @@ Event eventCopy(Event event);
 bool eventGet(Event event, char* name, int* event_id, Date date);
 
 
-const char* eventGetName(Event event);
+char* eventGetName(Event event);
 
 const Date eventGetDate(Event event);
 
 const int eventGetId(Event event);
+
+const Member eventGetMember(Event event);
 
 
 /**
