@@ -8,7 +8,7 @@
 #include "date.h"
 #include "member.h"
 
-
+/** Constants to Valideting events information */
 #define MIN_EVENT_ID 0
 
 
@@ -20,12 +20,13 @@ typedef struct Event_t *Event;
 *
 * @param name - the name of the event.
 * @param event_id - the id of the event.
-* @param date - the date if the event.
+* @param date - the date of the event.
 * @return
 * 	NULL - if allocation failed or event is illegal.
 * 	A new Event in case of success.
 */
 Event eventCreate(char* name, int event_id, Date date);
+
 
 /**
 * eventDestroy: Deallocates an existing event.
@@ -33,6 +34,7 @@ Event eventCreate(char* name, int event_id, Date date);
 * @param event - Target event to be deallocated. If event is NULL nothing will be done
 */
 void eventDestroy(Event event);
+
 
 /**
 * eventCopy: Creates a copy of target event.
@@ -43,6 +45,7 @@ void eventDestroy(Event event);
 * 	A event containing the same elements as event otherwise.
 */
 Event eventCopy(Event event);
+
 
 /**
 * eventGet: Returns the name, the id and the date of the event.
@@ -58,12 +61,47 @@ Event eventCopy(Event event);
 bool eventGet(Event event, char* name, int* event_id, Date date);
 
 
+/**
+* eventGetName: Returns the name of the event.
+*
+* @param event - Target event.
+* @return
+* 	NULL if a NULL was sent.
+* 	Otherwise pointer to the name of the event.
+*/
 char* eventGetName(Event event);
 
+
+/**
+* eventGetDate: Returns the date of the event.
+*
+* @param event - Target event.
+* @return
+* 	NULL if a NULL was sent.
+* 	Otherwise pointer to the date of the event.
+*/
 const Date eventGetDate(Event event);
 
+
+/**
+* eventGetId: Returns the id of the event.
+*
+* @param event - Target event.
+* @return
+* 	-1 if a NULL was sent.
+* 	Otherwise const pointer to the id of the event.
+*/
 const int eventGetId(Event event);
 
+
+/**
+* eventGetMember: Returns the Member list of the event.
+*
+* @param event - Target event.
+* @return
+* 	NULL if a NULL was sent.
+* 	Otherwise const pointer to the head the Member list of the event.
+*/
 const Member eventGetMember(Event event);
 
 
@@ -76,8 +114,15 @@ const Member eventGetMember(Event event);
 */
 bool eventEqual(Event event1, Event event2);
 
-bool eventCompare(Event event1, Event event2);
 
+/**
+* eventCompare: Checks if the events have same id and name.
+*
+* @return
+* 		True if same id and name.
+* 		Otherwise, false.
+*/
+bool eventCompare(Event event1, Event event2);
 
 
 #endif //EVENT_H_

@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+/** Constants to Valideting members id */
 #define MIN_ID 0
 
 /*
@@ -22,7 +24,7 @@ typedef enum MemberResult_t {
 typedef struct Member_t *Member;
 
 /**
-* memberCreate: Allocates a new member list with the member that specified.
+* memberCreate: Allocates a new member list with the member that specified at the head.
 *
 * @param name - the name of the member.
 * @param id - the id of the member.
@@ -65,11 +67,10 @@ Member memberCopy(Member member);
 bool memberInsert(Member member, Member to_add);
 
 
-
 /**
-* memberContain: Checks if member with specified id is on the member list
+* memberContain: Checks if member with specified id is on the member list.
 *
-* @param member - Target member list
+* @param member - Target member list.
 * @param id - the id of the member.
 * @return
 * 	false if one of pointers is NULL or if there is no member in the list with the id.
@@ -79,20 +80,36 @@ bool memberContain(Member member, int id);
 
 
 /**
-* memberRemove: Removes the member with the specified id from the member list
+* memberRemove: Removes the member with the specified id from the member list.
                 If there is no member with the if, nothing will happen.
 *
-* @param member - Target member list
-* @param id - the id to of the member to remove
+* @param member - Target member list.
+* @param id - the id to of the member to remove.
 *
 */
 void memberRemove(Member member, int id);
 
+
+/**
+* getMember: Returns a member within the member list, who have the specifeid member_id .
+*
+* @param member - Target member list.
+* @param member_id - the id to of the member to get.
+*
+* @return
+*   NULL if a NULL was sent or there is no member with the specifeid id in the member list.
+*   Otherwise return const pointer to the member
+*/
 const Member getMember(Member member, int member_id);
 
 
-
-//DELETE ME!!!!!
+/**
+* printMembers: prints the name of the members in list to the open fd file.
+*               If NULL was sent or file is not open in read mode - nothing will happen.
+*
+* @param member - Target member list.
+* @param fd - the open file to print.
+*/
 void printMembers(Member member, FILE* fd);
 
 #endif /**  MEMBER_H_  */

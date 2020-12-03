@@ -2,15 +2,6 @@
 #define DATE_H_
 
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-
-#define MAX_DAY 30
-#define MIN_DAY 1
-#define MAX_MONTH 12
-#define MIN_MONTH 1
-
 
 /** Type for defining the date */
 typedef struct Date_t *Date;
@@ -30,7 +21,7 @@ Date dateCreate(int day, int month, int year);
 /**
 * dateDestroy: Deallocates an existing Date.
 *
-* @param date - Target date to be deallocated. If date is NULL nothing will be done
+* @param date - Target date to be deallocated. If priority queue is NULL nothing will be done
 */
 void dateDestroy(Date date);
 
@@ -68,15 +59,12 @@ bool dateGet(Date date, int* day, int* month, int* year);
 */
 int dateCompare(Date date1, Date date2);
 
-
 /**
-* dateTick:  increases the date by one day, if date is NULL should do nothing.
+* dateTick: increases the date by one day, if date is NULL should do nothing.
 *
 * @param date - Target Date
 *
 */
 void dateTick(Date date);
-
-bool dateEqual(Date date1, Date date2);
 
 #endif //DATE_H_

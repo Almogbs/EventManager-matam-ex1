@@ -13,7 +13,6 @@
  *   Functions for operating on Event elements & Date priorety element
  *   in the generic ADT priorety queue
  */
-
 static PQElement copyEvent(PQElement event)
 {
     return (PQElement)eventCopy((Event)event);
@@ -43,10 +42,6 @@ static int compareDate(PQElementPriority date1, PQElementPriority date2)
 {
     return dateCompare((Date)date1, (Date)date2);
 }
-
-/**
- * 
- */
 
 
 // Struct for Event Manager

@@ -1,6 +1,6 @@
 #include "event.h"
 
-
+/** Struct representing the event */
 struct Event_t{
     char* name;
     int event_id;
@@ -135,7 +135,7 @@ bool eventCompare(Event event1, Event event2)
     {
         return false;
     }
-    if(strcmp(eventGetName(event1), eventGetName(event2)) == 0 && dateEqual(event1->date, event2->date))
+    if(strcmp(eventGetName(event1), eventGetName(event2)) == 0 && dateCompare(event1->date, event2->date) == 0)
     {
         return true;
     }

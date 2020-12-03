@@ -1,11 +1,14 @@
 #include "member.h"
 #include <assert.h>
 
+
+/** Struct representing the member(list) */
 struct Member_t {
     char* name;
     int id;
     struct Member_t* next;
 };
+
 
 Member memberCreate(char* name, int id)
 {
@@ -30,6 +33,7 @@ Member memberCreate(char* name, int id)
     member->next = NULL;
     return member;
 }
+
 
 void memberDestroy(Member member)
 {
@@ -87,6 +91,7 @@ const Member getMember(Member member, int member_id)
     return NULL;
 }
 
+
 Member memberCopy(Member member)
 {
     if(!member)
@@ -100,6 +105,7 @@ Member memberCopy(Member member)
     }
     return new_member;
 }
+
 
 bool memberContain(Member member, int id)
 {
@@ -118,6 +124,7 @@ bool memberContain(Member member, int id)
     }
     return false;
 }
+
 
 void memberRemove(Member member, int id)
 {
@@ -148,7 +155,6 @@ void memberRemove(Member member, int id)
     }
     return;
 }
-
 
 
 void printMembers(Member member, FILE* fd)

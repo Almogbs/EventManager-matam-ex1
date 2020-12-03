@@ -5,12 +5,29 @@
 #include "date.h"
 
 
+/** Constants to Valideting dates */
+#define MAX_DAY 30
+#define MIN_DAY 1
+#define MAX_MONTH 12
+#define MIN_MONTH 1
+
+
+/** Struct representing the date */
 struct Date_t {
     int day;
     int month;
     int year;
 };
 
+
+/**
+* isValidDate: Checks if date is valid.
+*
+* @param date - Target Date.
+* @return
+* 	True if data is valid.
+* 	Otherwise return false.
+*/
 static bool isValidDate(Date date)
 {
     if(date->day < MIN_DAY || date->day > MAX_DAY || date->month < MIN_MONTH || date->month > MAX_MONTH)
@@ -19,7 +36,6 @@ static bool isValidDate(Date date)
     }
     return true;
 }
-
 
 
 Date dateCreate(int day, int month, int year)
@@ -120,21 +136,4 @@ void dateTick(Date date)
         return;
     }
     date->day = date->day + 1;
-}
-
-
-
-bool dateEqual(Date date1, Date date2)
-{
-    if(dateCompare(date1, date2) != 0)
-    {
-        return false;
-    }
-    return true;
-}
-
-//DELETE ME!!!!!
-void printDate(Date date)
-{
-    printf("%d.%d.%d\n", date->day, date->month, date->year);
 }
