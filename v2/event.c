@@ -5,7 +5,7 @@ struct Event_t{
     char* name;
     int event_id;
     Date date;
-    Member members;
+    MemberList member_list;
 };
 
 
@@ -38,7 +38,7 @@ Event eventCreate(char* name, int event_id, Date date)
     event->name = event_name;
     event->event_id = event_id;
     event->date = event_date;
-    event->members = NULL;
+    event->member_list = NULL;
     return event;
 }
 
@@ -51,7 +51,7 @@ void eventDestroy(Event event)
     }
     free(event->name);
     dateDestroy(event->date);
-    memberDestroy(event->members);
+    memberListDestroy(event->member_list);
     free(event);
 }
 
@@ -109,13 +109,13 @@ const Date eventGetDate(Event event)
 }
 
 
-const Member eventGetMember(Event event)
+const MemberList eventGetMemberList(Event event)
 {
     if(!event)
     {
         return NULL;
     }
-    return event->members;
+    return event->member_list;
 }
 
 
