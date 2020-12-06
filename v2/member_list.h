@@ -100,10 +100,11 @@ const Member getMember(MemberList member_list, int member_id);
 */
 void printMemberList(MemberList member_list, FILE* fd);
 
+void printMembersAndEventNum(MemberList member_list, FILE* fd);
 
 
 void memberListAddToEventNum(MemberList member_list, int member_id, int n);
-void update(MemberList member_list1, MemberList member_list2);
+void memberListUpdatePassedEvent(MemberList member_list1, MemberList member_list2);
 
 #endif /**  MEMBER_LIST_H_  */
 

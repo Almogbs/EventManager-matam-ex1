@@ -104,15 +104,15 @@ int dateCompare(Date date1, Date date2)
 
     if(date1->year != date2->year)
     {
-        return (date1->year - date2->year);
+        return (date2->year - date1->year);
     }
     assert(date1->year - date2->year == 0);
     if(date1->month != date2->month)
     {
-        return (date1->month - date2->month);
+        return (date2->month - date1->month);
     }
     assert(date1->month - date2->month == 0);
-    return (date1->day - date2->day);
+    return (date2->day - date1->day);
 }
 
 

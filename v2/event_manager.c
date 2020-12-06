@@ -340,10 +340,20 @@ EventManagerResult emAddMemberToEvent(EventManager em, int member_id, int event_
     {
         return EM_EVENT_AND_MEMBER_ALREADY_LINKED;
     }
-    Member temp_member = getMember(em->member_list, member_id);   
-    if(memberListInsert(eventGetMemberList(event_ptr), temp_member))
+    Member temp_member = getMember(em->member_list, member_id);
+    if(!temp_member)
     {
-        memberListAddToEventNum(eventGetMemberList(event_ptr), member_id, 1);
+        return EM_OUT_OF_MEMORY;
+    }
+    char* temp_name = memberGetName(temp_member);
+    memberDestroy(temp_member);
+    Member new_member = memberCreate(temp_name, member_id);
+    if(!new_member)
+    {
+        return EM_OUT_OF_MEMORY;
+    }
+    if(memberListInsert(eventGetMemberList(event_ptr), new_member))
+    {
         memberListAddToEventNum(em->member_list, member_id, 1);
         return EM_SUCCESS;
     }
@@ -411,7 +421,7 @@ EventManagerResult emTick(EventManager em, int days)
         if(dateCompare(em->init_date, eventGetDate(iter)) > 0)
         {
             MemberList member_list = eventGetMemberList(iter);
-            update(em->member_list, member_list);
+            memberListUpdatePassedEvent(em->member_list, member_list);
             pqRemoveElement(em->event_list, (PQElement)iter);
         }
     }
@@ -437,6 +447,10 @@ char* emGetNextEvent(EventManager em)
 
 void emPrintAllEvents(EventManager em, const char* file_name)
 {
+    if(!em || !file_name)
+    {
+        return;
+    }
     FILE* fd = fopen(file_name, "w");
     if(!fd)
     {
@@ -444,21 +458,40 @@ void emPrintAllEvents(EventManager em, const char* file_name)
     }
     PQ_FOREACH(Event, iter, em->event_list)
     {
-        int *day = NULL, *month = NULL, *year = NULL;
-        Date date = eventGetDate(iter);
+        int day, month, year;
+        int *day_ptr = &day, *month_ptr = &month, *year_ptr = &year;
+        Date date = dateCopy(eventGetDate(iter));
         if(!date)
         {
-            return;
+            break;
         }
-        if(!dateGet(date, day, month, year))
+        if(!dateGet(date, day_ptr, month_ptr, year_ptr))
         {
-            return;
+            dateDestroy(date);
+            break;
         }
-        fprintf(fd, "%s,%d.%d.%d", eventGetName(iter), *day, *month, *year);
+        dateDestroy(date);
+        fprintf(fd, "%s,%d.%d.%d", eventGetName(iter), day, month, year);
         printMemberList(eventGetMemberList(iter), fd);
+        fprintf(fd, "\n");
     }
     fclose(fd);
 }
 
 
-void emPrintAllResponsibleMembers(EventManager em, const char* file_name);
+void emPrintAllResponsibleMembers(EventManager em, const char* file_name)
+{
+    if(!em || !file_name)
+    {
+        return;
+    }
+    FILE* fd = fopen(file_name, "w");
+    if(!fd)
+    {
+        return;
+    }
+    printMembersAndEventNum(em->member_list, fd);
+    fclose(fd);
+}
+
+

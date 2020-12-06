@@ -2,6 +2,11 @@
 #include "priority_queue.h"
 
 
+typedef struct MemberPriority_t{
+    int member_id;
+    int num_event;
+} *MemberPriority;
+
 /**
  *   Functions for operating on Member elements & Int priorety element
  *   in the generic ADT priorety queue
@@ -21,31 +26,45 @@ static bool equalMember(PQElement member1, PQElement member2)
     return memberEqual((Member)member1, (Member)member2);
 }
 
-static PQElementPriority copyInt(PQElementPriority event_num)
+static PQElementPriority copyInfo(PQElementPriority member_priority)
 {
-    if (!event_num) {
+    if (!member_priority) 
+    {
         return NULL;
     }
-    int *copy = malloc(sizeof(*copy));
-    if (!copy) {
+    MemberPriority temp = (MemberPriority)member_priority;
+    MemberPriority copy = malloc(sizeof(*copy));
+    if (!copy)
+    {
         return NULL;
     }
-    *copy = *(int *) event_num;
-    return copy;
+    copy->member_id = temp->member_id;
+    copy->num_event = temp->num_event;
+    return (PQElementPriority)copy;
 }
 
-static void freeInt(PQElementPriority event_num)
+static void freeInfo(PQElementPriority member_priority)
 {
-    if(!event_num)
+    if(!member_priority)
     {
         return;
     }
-    free(event_num);
+    free(member_priority);
 }
 
-static int compareInt(PQElementPriority event_num1, PQElementPriority event_num2)
+static int compareInfo(PQElementPriority member_info1, PQElementPriority member_info2)
 {
-    return *(int*)event_num1 - *(int*)event_num2;
+    if(!member_info1 || member_info2)
+    {
+        return 0;
+    }
+    MemberPriority member_priority1 = (MemberPriority)member_info1;
+    MemberPriority member_priority2 = (MemberPriority)member_info2;
+    if(member_priority1->num_event == member_priority2->num_event)
+    {
+        return member_priority2->member_id - member_priority1->member_id;
+    }
+    return member_priority1->num_event - member_priority2->num_event;
 }
 
 
@@ -62,7 +81,7 @@ MemberList memberListCreate()
     {
         return NULL;
     }
-    PriorityQueue member_queue = pqCreate(copyMember, freeMember, equalMember, copyInt, freeInt, compareInt);
+    PriorityQueue member_queue = pqCreate(copyMember, freeMember, equalMember, copyInfo, freeInfo, compareInfo);
     if(!member_queue)
     {
         free(member_list);
@@ -117,12 +136,20 @@ bool memberListInsert(MemberList member_list, Member to_add)
     {
         return false;
     }
-    int event_num = NO_EVENTS;
-    if(pqInsert(member_list->member_queue, new_member, &event_num) == PQ_SUCCESS)
+    MemberPriority member_priority = malloc(sizeof(*member_priority));
+    if(!member_priority)
     {
+        return false;
+    } 
+    member_priority->member_id = memberGetId(to_add);
+    member_priority->num_event = 0;
+    if(pqInsert(member_list->member_queue, (PQElement)new_member, (PQElementPriority)member_priority) == PQ_SUCCESS)
+    {
+        free(member_priority);
         memberDestroy(new_member);
         return true;
     }
+    free(member_priority);
     memberDestroy(new_member);
     return false;
 }
@@ -191,15 +218,29 @@ void memberListAddToEventNum(MemberList member_list, int member_id, int n)
     }
     int old_num = memberGetEventNum(temp_member);
     int new_num = memberGetEventNum(temp_member) + n;
+    MemberPriority member_priority_new = malloc(sizeof(*member_priority_new));
+    if(!member_priority_new)
+    {
+        return;
+    }    
+    MemberPriority member_priority_old = malloc(sizeof(*member_priority_old));
+    if(!member_priority_old)
+    {
+        return;
+    }
+    member_priority_new->member_id = member_id;
+    member_priority_new->num_event = new_num;
+    member_priority_old->member_id = member_id;
+    member_priority_old->num_event = old_num;
     pqChangePriority(   member_list->member_queue, 
                         (PQElement)temp_member, 
-                        (PQElementPriority)(&old_num),
-                        (PQElementPriority)(&new_num));
+                        (PQElementPriority)member_priority_old,
+                        (PQElementPriority)member_priority_new);
     return;
     }
 
 
-void update(MemberList member_list1, MemberList member_list2)
+void memberListUpdatePassedEvent(MemberList member_list1, MemberList member_list2)
 {
     if(!member_list1 || !member_list2)
     {
@@ -213,13 +254,30 @@ void update(MemberList member_list1, MemberList member_list2)
 
 void printMemberList(MemberList member_list, FILE* fd)
 {
-    if(!member_list || fd)
+    if(!member_list || !fd)
     {
         return;
     }
     PQ_FOREACH(Member, iter, member_list->member_queue)
     {
         fprintf(fd, ",%s", memberGetName(iter));
+    }
+    return;
+}
+
+void printMembersAndEventNum(MemberList member_list, FILE* fd)
+{
+    if(!member_list || !fd)
+    {
+        return;
+    }
+    PQ_FOREACH(Member, iter, member_list->member_queue)
+    {
+        if(memberGetEventNum(iter) == 0)
+        {
+            break;
+        }
+        fprintf(fd, "%s,%d\n", memberGetName(iter), memberGetEventNum(iter));
     }
     return;
 }
