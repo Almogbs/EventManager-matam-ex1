@@ -54,17 +54,17 @@ static void freeInfo(PQElementPriority member_priority)
 
 static int compareInfo(PQElementPriority member_info1, PQElementPriority member_info2)
 {
-    if(!member_info1 || member_info2)
-    {
+    if(!member_info1 || !member_info2) 
+    {                                           
         return 0;
     }
     MemberPriority member_priority1 = (MemberPriority)member_info1;
     MemberPriority member_priority2 = (MemberPriority)member_info2;
     if(member_priority1->num_event == member_priority2->num_event)
     {
-        return member_priority2->member_id - member_priority1->member_id;
+        return (member_priority2->member_id - member_priority1->member_id);
     }
-    return member_priority1->num_event - member_priority2->num_event;
+    return (member_priority1->num_event - member_priority2->num_event);
 }
 
 
@@ -120,7 +120,6 @@ MemberList memberListCopy(MemberList member_list)
     {
         return NULL;
     }
-
     return copy_member_list;
 }
 
@@ -185,7 +184,7 @@ void memberListRemove(MemberList member_list, int id)
             return;
         }
     }
-    return ;
+    return;
 }
 
 
@@ -211,21 +210,24 @@ void memberListAddToEventNum(MemberList member_list, int member_id, int n)
     {
         return;
     }
-    Member temp_member = getMember(member_list, member_id);
+    Member temp_member = memberCopy(getMember(member_list, member_id));
     if(!temp_member)
     {
         return;
     }
-    int old_num = memberGetEventNum(temp_member);
-    int new_num = memberGetEventNum(temp_member) + n;
+    int old_num = memberGetEventNum(getMember(member_list, member_id));
+    int new_num = memberGetEventNum(getMember(member_list, member_id)) + n;
     MemberPriority member_priority_new = malloc(sizeof(*member_priority_new));
     if(!member_priority_new)
     {
+        memberDestroy(temp_member);
         return;
     }    
     MemberPriority member_priority_old = malloc(sizeof(*member_priority_old));
     if(!member_priority_old)
     {
+        memberDestroy(temp_member);
+        free(member_priority_new);
         return;
     }
     member_priority_new->member_id = member_id;
@@ -236,8 +238,12 @@ void memberListAddToEventNum(MemberList member_list, int member_id, int n)
                         (PQElement)temp_member, 
                         (PQElementPriority)member_priority_old,
                         (PQElementPriority)member_priority_new);
+    memberSetNumEvent(getMember(member_list, member_id), new_num);
+    memberDestroy(temp_member);
+    free(member_priority_new);
+    free(member_priority_old);
     return;
-    }
+}
 
 
 void memberListUpdatePassedEvent(MemberList member_list1, MemberList member_list2)
@@ -258,9 +264,9 @@ void printMemberList(MemberList member_list, FILE* fd)
     {
         return;
     }
-    PQ_FOREACH(Member, iter, member_list->member_queue)
+    PQ_FOREACH(Member, iterator, member_list->member_queue)
     {
-        fprintf(fd, ",%s", memberGetName(iter));
+        fprintf(fd, ",%s", memberGetName(iterator));
     }
     return;
 }

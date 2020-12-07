@@ -113,13 +113,15 @@ bool memberCompare(Member member1, Member member2)
 }
 
 
-void memberAddToEventNum(Member member, int n)
+void memberSetNumEvent(Member member, int n)
 {
     if(!member)
     {
         return;
-    }
-    member->event_num = member->event_num + n;
+    }    
+    member->event_num =  n;
+    //printf("^^^%d %d %d\n",n , memberGetId(member),memberGetEventNum(member));
+
     return;
 }
 

@@ -102,6 +102,6 @@ bool memberEqual(Member member1, Member member2);
 bool memberCompare(Member member1, Member member2);
 
 int memberGetEventNum(Member member);
-void memberAddToEventNum(Member member, int n);
+void memberSetNumEvent(Member member, int n);
 
 #endif //MEMBER_H_

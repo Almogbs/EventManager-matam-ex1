@@ -41,7 +41,7 @@ static void freeDate(PQElementPriority date)
 
 static int compareDate(PQElementPriority date1, PQElementPriority date2)
 {
-    return dateCompare((Date)date1, (Date)date2);
+    return -dateCompare((Date)date1, (Date)date2);
 }
 
 
@@ -76,9 +76,17 @@ EventManager createEventManager(Date date)
         pqDestroy(pq);
         return NULL;
     }
+    MemberList member_list = memberListCreate();
+    if(!member_list)
+    {
+        free(em);
+        pqDestroy(pq);
+        dateDestroy(date);
+        return NULL;
+    }
     em->event_list = pq;
     em->init_date = init_date;
-    em->member_list = NULL;
+    em->member_list = member_list;
     return em;
 }
 
@@ -200,6 +208,7 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
             break;
         }
     }
+    memberListUpdatePassedEvent(em->member_list, eventGetMemberList(temp_event));
     PriorityQueueResult result = pqRemoveElement(em->event_list, (PQElement)temp_event);
     switch(result)
     {
@@ -346,7 +355,6 @@ EventManagerResult emAddMemberToEvent(EventManager em, int member_id, int event_
         return EM_OUT_OF_MEMORY;
     }
     char* temp_name = memberGetName(temp_member);
-    memberDestroy(temp_member);
     Member new_member = memberCreate(temp_name, member_id);
     if(!new_member)
     {
@@ -355,8 +363,10 @@ EventManagerResult emAddMemberToEvent(EventManager em, int member_id, int event_
     if(memberListInsert(eventGetMemberList(event_ptr), new_member))
     {
         memberListAddToEventNum(em->member_list, member_id, 1);
+        memberDestroy(new_member);
         return EM_SUCCESS;
     }
+    memberDestroy(new_member);
     return EM_OUT_OF_MEMORY;
 }
 
@@ -388,7 +398,7 @@ EventManagerResult emRemoveMemberFromEvent(EventManager em, int member_id, int e
     {
         return EM_EVENT_ID_NOT_EXISTS;
     }
-    if(memberListContain(em->member_list, member_id))
+    if(!memberListContain(em->member_list, member_id))
     {
         return EM_MEMBER_ID_NOT_EXISTS;
     }

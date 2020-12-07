@@ -1,4 +1,5 @@
 #include "event_manager.h"
+#include<stdio.h>
 
 int main()
 {
@@ -14,6 +15,7 @@ int main()
     emAddEventByDate(em, "bor", date4, 3124);
     emAddEventByDiff(em, "paka", 22, 4444);
     emAddEventByDiff(em, "poke", 366, 1111);
+    emAddEventByDiff(em, "poki", 377, 2222);
     emAddMember(em, "Almog", 22);
     emAddMember(em, "Ben", 11);
     emAddMember(em, "Shaul", 1);
@@ -26,16 +28,24 @@ int main()
     emAddMemberToEvent(em, 2, 1111);
     emAddMemberToEvent(em, 1, 1111);
     emAddMemberToEvent(em, 3, 1111);
-    emAddMemberToEvent(em, 4, 1111);
+    emAddMemberToEvent(em, 11, 1111);
     emAddMemberToEvent(em, 5, 1111);
     emAddMemberToEvent(em, 7, 1111);
-    emAddMemberToEvent(em, 22, 1111);
-    emAddMemberToEvent(em, 11, 1111);
+    emAddMemberToEvent(em, 4, 1111);
     emAddMemberToEvent(em, 33, 1111);
+    emAddMemberToEvent(em, 33, 2222);
+    emAddMemberToEvent(em, 22, 1111);
 
     emPrintAllEvents(em, "file1");
     emPrintAllResponsibleMembers(em, "file2");
+    emRemoveEvent(em, 4444);
+    emPrintAllEvents(em, "file3");
+    emPrintAllResponsibleMembers(em, "file4");
+    emRemoveMemberFromEvent(em, 33, 2222);
+    emPrintAllEvents(em, "file5");
+    emPrintAllResponsibleMembers(em, "file6");
 
+    
     dateDestroy(date);
     dateDestroy(date1);
     dateDestroy(date2);

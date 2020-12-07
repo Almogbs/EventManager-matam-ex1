@@ -95,24 +95,23 @@ bool dateGet(Date date, int* day, int* month, int* year)
 }
 
 
-int dateCompare(Date date1, Date date2)
+int dateCompare(Date date1, Date date2) 
 {
     if(!date1 || !date2)
     {
         return 0;
     }
-
-    if(date1->year != date2->year)
+    if(date1->year != date2->year) 
     {
-        return (date2->year - date1->year);
+        return (date1->year - date2->year);
     }
     assert(date1->year - date2->year == 0);
-    if(date1->month != date2->month)
+    if(date2->month != date1->month)
     {
-        return (date2->month - date1->month);
+        return (date1->month - date2->month); 
     }
     assert(date1->month - date2->month == 0);
-    return (date2->day - date1->day);
+    return (date1->day - date2->day);         
 }
 
 

@@ -33,12 +33,12 @@ Event eventCreate(char* name, int event_id, Date date)
         free(event_name);
         return NULL;
     }
-    
+    MemberList member_list = memberListCreate();
     strcpy(event_name, name);
     event->name = event_name;
     event->event_id = event_id;
     event->date = event_date;
-    event->member_list = NULL;
+    event->member_list = member_list;
     return event;
 }
 
