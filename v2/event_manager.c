@@ -175,6 +175,10 @@ EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days,
     {
         return EM_NULL_ARGUMENT;
     }
+    if(days < 0)
+    {
+        return EM_INVALID_DATE;
+    }
     Date new_date = dateCopy(em->init_date);
     if(!new_date)
     {
@@ -230,6 +234,10 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
     {
         return EM_NULL_ARGUMENT;
     }
+    if(dateCompare(new_date, em->init_date) < 0)
+    {
+        return EM_INVALID_DATE;
+    }
     if(event_id < MIN_EVENT_ID)
     {
         return EM_INVALID_EVENT_ID;
@@ -247,20 +255,22 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
     {
         return EM_EVENT_ID_NOT_EXISTS;
     }
-    if(dateCompare(new_date, em->init_date) > 0)
+    temp_event = eventCopy(temp_event);
+    if(!temp_event)
     {
-        return EM_INVALID_DATE;
+        return EM_OUT_OF_MEMORY;
     }
-    
-    Event iterate_event = eventCreate(eventGetName(temp_event), eventGetId(temp_event), eventGetDate(temp_event));
+    Event iterate_event = eventCreate(eventGetName(temp_event), eventGetId(temp_event), new_date);
     if(!iterate_event)
     {
+        eventDestroy(temp_event);
         return EM_OUT_OF_MEMORY;
     }
     PQ_FOREACH(Event, iter, em->event_list)
     {
-        if(eventCompare(iter, iterate_event))
+        if(eventCompare(iter, iterate_event) && !eventEqual(iter, iterate_event))
         {
+            eventDestroy(temp_event);
             eventDestroy(iterate_event);
             return EM_EVENT_ALREADY_EXISTS;
         }
@@ -269,7 +279,8 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
                                                     (PQElement)temp_event, 
                                                     (PQElementPriority)eventGetDate(temp_event), 
                                                     (PQElementPriority)new_date);
-    eventDestroy(iterate_event);                                                
+    eventDestroy(iterate_event); 
+    eventDestroy(temp_event);                                               
     switch(result)
     {
     case PQ_NULL_ARGUMENT:
@@ -441,6 +452,10 @@ EventManagerResult emTick(EventManager em, int days)
 
 int emGetEventsAmount(EventManager em)
 {
+    if(!em)
+    {
+        return -1;
+    }
     return pqGetSize(em->event_list);
 }
 

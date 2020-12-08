@@ -98,6 +98,7 @@ void memberListDestroy(MemberList member_list)
     {
         return;
     }
+
     pqDestroy(member_list->member_queue);
     free(member_list);
 }
@@ -110,16 +111,22 @@ MemberList memberListCopy(MemberList member_list)
     {
         return NULL;
     }
-    MemberList copy_member_list = malloc(sizeof(*copy_member_list));
+    MemberList copy_member_list = memberListCreate();
     if(!copy_member_list)
     {
         return NULL;
     }
-    copy_member_list->member_queue = pqCopy(member_list->member_queue);
-    if(!copy_member_list->member_queue)
+    if(pqGetSize(member_list->member_queue)==0)
+    {
+        return copy_member_list;
+    }
+    PriorityQueue new_member_list = pqCopy(member_list->member_queue);
+    if(!new_member_list)
     {
         return NULL;
     }
+    pqDestroy(copy_member_list->member_queue);
+    copy_member_list->member_queue = new_member_list;
     return copy_member_list;
 }
 

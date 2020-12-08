@@ -75,7 +75,7 @@ Date dateCopy(Date date)
     }
     Date new_date = dateCreate(date->day, date->month, date->year);
     if(!new_date)
-    {
+    {                                
         return NULL;
     }
     return new_date;

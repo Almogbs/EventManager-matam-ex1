@@ -34,6 +34,10 @@ Event eventCreate(char* name, int event_id, Date date)
         return NULL;
     }
     MemberList member_list = memberListCreate();
+    if(!member_list)
+    {
+        return NULL;
+    }
     strcpy(event_name, name);
     event->name = event_name;
     event->event_id = event_id;
@@ -62,7 +66,19 @@ Event eventCopy(Event event)
     {
         return NULL;
     }
-    return eventCreate(event->name, event->event_id, event->date);
+    Event new_event = eventCreate(event->name, event->event_id, event->date);
+    if(!new_event)
+    {
+        return NULL;
+    }
+    memberListDestroy(new_event->member_list);
+    new_event->member_list = memberListCopy(event->member_list);
+    if(!new_event->member_list)
+    {
+        eventDestroy(new_event);
+        return NULL;
+    }
+    return new_event;
 }
 
 

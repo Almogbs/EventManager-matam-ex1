@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "priority_queue.h"
+#include"event.h"
+#include"date.h"
 
 /** Type for defining Node to the priority queue */
 typedef struct Node_t *Node;
@@ -174,7 +176,7 @@ PriorityQueue pqCopy(PriorityQueue queue)
             return NULL;
         }
         new_head_ptr->next = node;
-        new_head_ptr = new_head_ptr->next;//bug :(
+        new_head_ptr = new_head_ptr->next;
         head_ptr = head_ptr->next;
     }
     new_queue->iterator = NULL;

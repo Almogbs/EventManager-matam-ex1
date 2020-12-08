@@ -51,7 +51,13 @@ Member memberCopy(Member member)
     {
         return NULL;
     }
-    return memberCreate(member->name, member->member_id);
+    Member new_member = memberCreate(member->name, member->member_id);
+    if(!new_member)
+    {
+        return NULL;
+    }
+    new_member->event_num = member->event_num;
+    return new_member;
 }
 
 

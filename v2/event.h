@@ -117,7 +117,7 @@ bool eventEqual(Event event1, Event event2);
 
 
 /**
-* eventCompare: Checks if the events have same id and name.
+* eventCompare: Checks if the events have same date and name.
 *
 * @return
 * 		True if same id and name.
