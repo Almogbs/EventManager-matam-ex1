@@ -86,7 +86,8 @@ bool isFilePrintOutputCorrect(char *file_name, char *expected_output) {
 
 
     writeOutputToFile(file_name, expected_output);
-    printf("<br>&nbsp;&nbsp;&nbsp;&nbsp;> Printing output: <a href='/staging/{STAGING_ID}/%s'>%s</a> | Expected output: <a href='/staging/{STAGING_ID}/expected_%s'>expected_%s</a> (Might be correct)", file_name, file_name, file_name, file_name);
+    printf("<br>&nbsp;&nbsp;&nbsp;&nbsp;> Printing output: <a href='/staging/{STAGING_ID}/%s'>%s</a> | Expected output: <a href='/staging/{STAGING_ID}/expected_%s'>expected_%s</a> (Might be correct)",
+           file_name, file_name, file_name, file_name);
     bool result = (strncmp(buffer, expected_output, numbytes) == 0);
     free(buffer);
     return result;
@@ -422,9 +423,11 @@ bool testEMChangeEventDateReinsertsTheEvent() {
     ASSERT(emAddEventByDiff(em, "event5", 1, 5) == EM_SUCCESS);
     ASSERT(strcmp(emGetNextEvent(em), "event1") == 0);
 
-    ASSERT(emChangeEventDate(em, 5, date) == EM_SUCCESS); // Change event to same day - might find bugs
+    ASSERT(emChangeEventDate(em, 5, date) == EM_EVENT_ALREADY_EXISTS); // Change event to same day - might find bugs
     ASSERT(strcmp(emGetNextEvent(em), "event1") == 0);
+    dateDestroy(date);
 
+    date = dateCreate(9, 9, 2000);
     ASSERT(emChangeEventDate(em, 1, date) == EM_SUCCESS);
     ASSERT(strcmp(emGetNextEvent(em), "event3") == 0);
 
@@ -564,11 +567,11 @@ bool testEMAddMemberToEventBasicUsage() {
     ASSERT(emAddMember(em, "member2", 2) == EM_SUCCESS);
     ASSERT(emAddEventByDiff(em, "event1", 1, 1) == EM_SUCCESS);
 
-    date = dateCreate(2, 1, 2000);
     ASSERT(emAddMemberToEvent(em, 1, 1) == EM_SUCCESS);
     ASSERT(emAddMemberToEvent(em, 2, 1) == EM_SUCCESS);
+
+    date = dateCreate(3, 1, 2000);
     ASSERT(emChangeEventDate(em, 1, date) == EM_SUCCESS);
-    ASSERT(emAddMemberToEvent(em, 1, 1) == EM_EVENT_AND_MEMBER_ALREADY_LINKED); // Changing event doesnt fuck up members
 
     ASSERT(emRemoveMemberFromEvent(em, 1, 1) == EM_SUCCESS);
     ASSERT(emAddMemberToEvent(em, 1, 1) == EM_SUCCESS);  // Can add member after removing him
@@ -699,6 +702,7 @@ bool testEMTickDeletesPastEvents() {
     return result;
 }
 
+// TODO: add test that emTick does -1 to the event counter of members in deleted events
 
 
 /* ========== TESTING emGetEventsAmount ========== */
@@ -808,7 +812,7 @@ bool testEMPrintAllResponsibleMembersSimpleTests() {
     ASSERT(emAddEventByDiff(em, "event1", 1, 1) == EM_SUCCESS);
     ASSERT(emAddMemberToEvent(em, 1, 1) == EM_SUCCESS);
     emPrintAllResponsibleMembers(em, "simple_tests1.out.txt");
-    ASSERT(isFilePrintOutputCorrect("simple_tests1.out.txt", "member1,1"));
+    ASSERT(isFilePrintOutputCorrect("simple_tests1.out.txt", "member1,1\n"));
 
 
     ASSERT(emAddMember(em, "member2", 2) == EM_SUCCESS);
@@ -816,11 +820,11 @@ bool testEMPrintAllResponsibleMembersSimpleTests() {
     ASSERT(emAddMemberToEvent(em, 2, 2) == EM_SUCCESS);
     ASSERT(emAddMemberToEvent(em, 1, 2) == EM_SUCCESS);
     emPrintAllResponsibleMembers(em, "simple_tests2.out.txt");
-    ASSERT(isFilePrintOutputCorrect("simple_tests2.out.txt", "member1,2\nmember2,1"));
+    ASSERT(isFilePrintOutputCorrect("simple_tests2.out.txt", "member1,2\nmember2,1\n"));
 
     ASSERT(emAddMemberToEvent(em, 2, 1) == EM_SUCCESS);
     emPrintAllResponsibleMembers(em, "simple_tests3.out.txt");
-    ASSERT(isFilePrintOutputCorrect("simple_tests3.out.txt", "member1,2\nmember2,2"));
+    ASSERT(isFilePrintOutputCorrect("simple_tests3.out.txt", "member1,2\nmember2,2\n"));
 
 
     emTick(em, 5);
@@ -856,7 +860,8 @@ bool testEMPrintAllEventsBasicTests() {
     emAddMemberToEvent(em, 1, 3);
 
     emPrintAllEvents(em, "basic_tests1.out.txt");
-    ASSERT(isFilePrintOutputCorrect("basic_tests1.out.txt", "event1,2.1.2000,member1,member2,member3\nevent4,2.1.2000\nevent2,3.1.2000,member1,member3\nevent3,3.1.2000,member1"));
+    ASSERT(isFilePrintOutputCorrect("basic_tests1.out.txt",
+                                    "event1,2.1.2000,member1,member2,member3\nevent4,2.1.2000\nevent2,3.1.2000,member1,member3\nevent3,3.1.2000,member1\n"));
 
     destroy:
     dateDestroy(date);
@@ -938,19 +943,21 @@ bool testBigEventManagerCreatorYanTomsinsky() {
     ASSERT_TEST(emRemoveMemberFromEvent(em, 2, 1) == EM_EVENT_AND_MEMBER_NOT_LINKED, destroyDates2);
 
     emPrintAllEvents(em, "yan_file1.out.txt");
-    isFilePrintOutputCorrect("yan_file1.out.txt", "event1,1.12.2020,yan1,yan5\nevent4,4.12.2020,yan1,yan5\nevent2,5.12.2020,yan1,yan2,yan3,yan4,yan5\n event3,10.12.2020,yan1,yan2");
+    isFilePrintOutputCorrect("yan_file1.out.txt",
+                             "event1,1.12.2020,yan1,yan5\nevent4,4.12.2020,yan1,yan5\nevent2,5.12.2020,yan1,yan2,yan3,yan4,yan5\n event3,10.12.2020,yan1,yan2\n");
 
     emPrintAllResponsibleMembers(em, "yan_file2.out.txt");
-    isFilePrintOutputCorrect("yan_file2.out.txt", "yan1,4\nyan5,3\nyan2,2\nyan3,1\nyan4,1");
+    isFilePrintOutputCorrect("yan_file2.out.txt", "yan1,4\nyan5,3\nyan2,2\nyan3,1\nyan4,1\n");
 
     ASSERT_TEST(emTick(em, 4) == EM_SUCCESS, destroyDates2);
     ASSERT_TEST(emGetEventsAmount(em) == 2, destroyDates2);
 
     emPrintAllEvents(em, "yan_file3.out.txt");
-    isFilePrintOutputCorrect("yan_file3.out.txt", "event2,5.12.2020,yan1,yan2,yan3,yan4,yan5\nevent3,10.12.2020,yan1,yan2");
+    isFilePrintOutputCorrect("yan_file3.out.txt",
+                             "event2,5.12.2020,yan1,yan2,yan3,yan4,yan5\nevent3,10.12.2020,yan1,yan2\n");
 
     emPrintAllResponsibleMembers(em, "yan_file4.out.txt");
-    isFilePrintOutputCorrect("yan_file4.out.txt", "yan1,2\nyan2,2\nyan3,1\nyan4,1\nyan5,1");
+    isFilePrintOutputCorrect("yan_file4.out.txt", "yan1,2\nyan2,2\nyan3,1\nyan4,1\nyan5,1\n");
 
     ASSERT_TEST(emTick(em, 2) == EM_SUCCESS, destroyDates2);
     ASSERT_TEST(emGetEventsAmount(em) == 1, destroyDates2);

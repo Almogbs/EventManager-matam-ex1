@@ -126,4 +126,7 @@ bool eventEqual(Event event1, Event event2);
 bool eventCompare(Event event1, Event event2);
 
 
+void eventChangeDate(Event event, Date new_date);
+
+
 #endif //EVENT_H_

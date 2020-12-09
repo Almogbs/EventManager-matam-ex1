@@ -268,7 +268,7 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
     }
     PQ_FOREACH(Event, iter, em->event_list)
     {
-        if(eventCompare(iter, iterate_event) && !eventEqual(iter, iterate_event))
+        if(eventCompare(iter, iterate_event))
         {
             eventDestroy(temp_event);
             eventDestroy(iterate_event);
@@ -279,8 +279,20 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
                                                     (PQElement)temp_event, 
                                                     (PQElementPriority)eventGetDate(temp_event), 
                                                     (PQElementPriority)new_date);
+    if(result == PQ_SUCCESS)
+    {
+        PQ_FOREACH(Event, iter, em->event_list)
+        {
+            if(eventEqual(iter, iterate_event))
+            {
+                eventChangeDate(iter, new_date);
+                break;
+            }
+        }
+    }    
+
     eventDestroy(iterate_event); 
-    eventDestroy(temp_event);                                               
+    eventDestroy(temp_event);                                     
     switch(result)
     {
     case PQ_NULL_ARGUMENT:
@@ -437,14 +449,20 @@ EventManagerResult emTick(EventManager em, int days)
     {
         dateTick(em->init_date);
     }
+    int events_to_remove = 0;
     PQ_FOREACH(Event, iter, em->event_list)
     {
         if(dateCompare(em->init_date, eventGetDate(iter)) > 0)
         {
-            MemberList member_list = eventGetMemberList(iter);
-            memberListUpdatePassedEvent(em->member_list, member_list);
-            pqRemoveElement(em->event_list, (PQElement)iter);
+            events_to_remove++;
         }
+    }
+    for(int i=0; i<events_to_remove; i++)
+    {
+            Event first_to_remove = (Event)pqGetFirst(em->event_list);
+            MemberList member_list = eventGetMemberList(first_to_remove);
+            memberListUpdatePassedEvent(em->member_list, member_list);
+            pqRemoveElement(em->event_list, (PQElement)first_to_remove);
     }
     return EM_SUCCESS;
 }

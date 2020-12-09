@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "priority_queue.h"
-#include"event.h"
-#include"date.h"
 
 /** Type for defining Node to the priority queue */
 typedef struct Node_t *Node;
@@ -250,7 +248,7 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
         return PQ_SUCCESS;
     }
     Node temp_head = queue->head;
-    while((temp_head->next) && queue->compare_priorities(temp_head->next->priority, to_add->priority) > 0)
+    while((temp_head->next) && queue->compare_priorities(temp_head->next->priority, to_add->priority) >= 0)
     {
         temp_head = temp_head->next;
     }

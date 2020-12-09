@@ -149,6 +149,19 @@ bool eventEqual(Event event1, Event event2)
 }
 
 
+void eventChangeDate(Event event, Date new_date)
+{
+    if(!event || !new_date)
+    {
+        return;
+    }
+    dateDestroy(event->date);
+    Date new = dateCopy(new_date);
+    event->date = new;
+    return;
+}
+
+
 bool eventCompare(Event event1, Event event2)
 {
     if(!event1 || !event2)
