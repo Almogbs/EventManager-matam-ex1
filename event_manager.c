@@ -130,7 +130,6 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
             return EM_OUT_OF_MEMORY;
         }
     }
-
     PQ_FOREACH(Event, iter, em->event_list)
     {
         if(eventCompare(iter, new_event))
@@ -290,7 +289,6 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
             }
         }
     }    
-
     eventDestroy(iterate_event); 
     eventDestroy(temp_event);                                     
     switch(result)

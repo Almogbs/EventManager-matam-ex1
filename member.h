@@ -81,10 +81,11 @@ char* memberGetName(Member member);
 const int memberGetId(Member member);
 
 
-
 /**
 * memberEqual: Checks if the members have same id.
 *
+* @param member1 - Target member1.
+* @param member2 - Target member2.
 * @return
 * 		True if same id.
 * 		Otherwise, false.
@@ -95,13 +96,33 @@ bool memberEqual(Member member1, Member member2);
 /**
 * memberCompare: Checks if the members have same id and name.
 *
+* @param member1 - Target member1.
+* @param member2 - Target member2.
 * @return
 * 		True if same id and name.
 * 		Otherwise, false.
 */
 bool memberCompare(Member member1, Member member2);
 
+
+/**
+* memberGetEventNum: Returns the number of events that the member is in charged of.
+*
+* @param member - Target member.
+* @return
+* 		-1 if NULL was sent.
+*       Otherwise, the number of events
+*/
 int memberGetEventNum(Member member);
-void memberSetNumEvent(Member member, int n);
+
+
+/**
+* memberGetEventNum: Changes the number of events that the member is in charged of, to new_event_num.
+*                    If NULL was sent or new_event_num is negative - nothing will happen.
+*
+* @param member - Target member.
+* @param new_event_num - New nember of events to update.
+*/
+void memberSetNumEvent(Member member, int new_event_num);
 
 #endif //MEMBER_H_

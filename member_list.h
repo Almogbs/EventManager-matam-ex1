@@ -92,6 +92,27 @@ const Member getMember(MemberList member_list, int member_id);
 
 
 /**
+* memberListAddToEventNum: add (or subtract) n from the amount of events of the member 
+*                          with the same id as member_id.
+*
+* @param member_list - Target member list.
+* @param member_id - the id to of the member to remove.
+* @param n - Target member list.
+*/
+void memberListAddToEventNum(MemberList member_list, int member_id, int n);
+
+
+/**
+* memberListUpdatePassedEvent: Subtract 1 from the amount of the events of the members in member_list1,
+*                              for all members in member_list2 
+*
+* @param member_list1 - Target member list to update.
+* @param member_list2 - Reference list of members that will be updated.
+*/
+void memberListUpdatePassedEvent(MemberList member_list1, MemberList member_list2);
+
+
+/**
 * printMemberList: prints the name of the members in list to the open fd file.
 *               If NULL was sent or file is not open in read mode - nothing will happen.
 *
@@ -100,11 +121,16 @@ const Member getMember(MemberList member_list, int member_id);
 */
 void printMemberList(MemberList member_list, FILE* fd);
 
+
+/**
+* printMembersAndEventNum: prints the name and the number of events of the members in the member list to the open fd file.
+*               If NULL was sent or file is not open in read mode - nothing will happen.
+*
+* @param member_list - Target member list.
+* @param fd - the open file to print.
+*/
 void printMembersAndEventNum(MemberList member_list, FILE* fd);
 
-
-void memberListAddToEventNum(MemberList member_list, int member_id, int n);
-void memberListUpdatePassedEvent(MemberList member_list1, MemberList member_list2);
 
 #endif /**  MEMBER_LIST_H_  */
 

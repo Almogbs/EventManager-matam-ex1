@@ -1,7 +1,7 @@
 #include "member_list.h"
 #include "priority_queue.h"
 
-
+/** Struct representing the Member list */
 typedef struct MemberPriority_t{
     int member_id;
     int num_event;
@@ -102,7 +102,6 @@ void memberListDestroy(MemberList member_list)
     pqDestroy(member_list->member_queue);
     free(member_list);
 }
-
 
 
 MemberList memberListCopy(MemberList member_list)

@@ -109,6 +109,8 @@ const MemberList eventGetMemberList(Event event);
 /**
 * eventEqual: Checks if the events have same id.
 *
+* @param event1 - First event.
+* @param event2 - Second event.
 * @return
 * 		True if same id.
 * 		Otherwise, false.
@@ -125,7 +127,12 @@ bool eventEqual(Event event1, Event event2);
 */
 bool eventCompare(Event event1, Event event2);
 
-
+/**
+* eventChangeDate: Change the date of the event to new_date.
+*
+* @param event - Target event.
+* @param new_date - The new date.
+*/
 void eventChangeDate(Event event, Date new_date);
 
 
